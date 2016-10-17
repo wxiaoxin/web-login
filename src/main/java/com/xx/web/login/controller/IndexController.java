@@ -1,13 +1,13 @@
 package com.xx.web.login.controller;
 
 import com.xx.web.login.base.BaseController;
-import com.xx.web.login.entity.User;
 import com.xx.web.login.service.IUserService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.servlet.ModelAndView;
 
-import javax.servlet.http.Cookie;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,39 +19,33 @@ import java.util.Map;
 @Controller
 public class IndexController extends BaseController {
 
+
     @Autowired
     private IUserService userService;
 
+
     @RequestMapping("/index")
-    public String index() {
-
-        Cookie[] cookies = req.getCookies();
-        for (Cookie cookie : cookies) {
-            if (cookie.getName().equals("WY_USER")) {
-                String value = cookie.getValue();
-                if (!value.equals("")) {
-                    // 从Cookie中读取身份信息，进行自动登陆
-                    String[] userInfo = value.split("-");
-                    String userId = userInfo[0];
-                    String userName = userInfo[1];
-                    String password = userInfo[2];
-                    Map<String, Object> loginResult = userService.login(userName, password);
-                    String stateCode = String.valueOf(loginResult.get("stateCode"));
-                    if(stateCode.equals("1")) {
-                        // 获取成功登陆的用户对象
-                        User loginUser = (User) loginResult.get("user");
-                        // 将成功登陆的用户id保存进session中
-                        req.getSession().setAttribute("LOGIN_USER_ID", loginUser.getId());
-                        // 用户无操作时，session维持最长存活时间
-                        req.getSession().setMaxInactiveInterval(60 * 10);
-                        // 自动登陆成功，重定向到欢迎页面
-                        return "redirect:/welcome.htm";
-                    }
-
-                }
+    public ModelAndView index() {
+        ModelAndView mv = new ModelAndView();
+        // 判断用户是否已经登录
+        if (!isLogin()) {
+            // 如果用户尚未登陆，则根据cookie判断是否自动登陆
+            if (userService.autoLogin(req, resp)) {
+                // 自动登陆成功，则自动跳转到首页
+                String userId = getLoginUserId();
+                mv.addObject("userid", userId);
+                mv.setViewName("index");
+            } else {
+                // 用户尚未登陆，则无法自动登陆，则跳转到登陆页
+                mv.setViewName("login");
             }
+        } else {
+            mv.setViewName("index");
+            // 自动登陆成功，则自动跳转到首页
+            mv.addObject("userid", getLoginUserId());
+            mv.setViewName("index");
         }
-        return "index";
+        return mv;
     }
 
 }

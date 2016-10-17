@@ -1,7 +1,6 @@
 package com.xx.web.login.service;
 
-import com.xx.web.login.entity.User;
-
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Map;
 
@@ -14,21 +13,37 @@ import java.util.Map;
 public interface IUserService {
 
     /**
-     * 登陆
+     * 用户登录
      *
-     * @param name     用户名
-     * @param password 密码
+     * @param name      用户名
+     * @param password  密码
+     * @param autoLogin 是否自动登陆
+     * @param req       http请求
+     * @param resp      http响应
+     * @return 登陆结果
      */
-    Map<String, Object> login(String name, String password);
-
+    Map<String, Object> login(String name, String password, boolean autoLogin, HttpServletRequest req, HttpServletResponse resp);
 
     /**
-     * 设置响应的Cookie
+     * 自动登陆
      *
-     * @param user      用户
-     * @param autoLogin 自动登陆
-     * @param resp      http响应
+     * @param req http请求
+     * @return 自动的登陆结果：true-自动登陆成功，false-自动登陆失败
      */
-    void setCookie(User user, boolean autoLogin, HttpServletResponse resp);
+    boolean autoLogin(HttpServletRequest req, HttpServletResponse resp);
+
+    /**
+     * 清除登陆cookie
+     *
+     * @param req http请求
+     */
+    void clearCookie(HttpServletRequest req);
+
+    /**
+     * 清楚session
+     *
+     * @param req http请求
+     */
+    void invalidSession(HttpServletRequest req);
 
 }

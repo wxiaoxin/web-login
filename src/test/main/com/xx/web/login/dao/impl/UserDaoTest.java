@@ -2,6 +2,7 @@ package com.xx.web.login.dao.impl;
 
 import com.xx.web.login.dao.IUserDao;
 import com.xx.web.login.entity.User;
+import com.xx.web.login.util.MD5Utils;
 import com.xx.web.login.util.UUIDGenerator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
@@ -31,8 +32,8 @@ public class UserDaoTest {
     public void testSave() throws Exception {
         User user = new User();
         user.setId(UUIDGenerator.randomUUID());
-        user.setUsername("qw");
-        user.setPassword("qw");
+        user.setUsername("a");
+        user.setPassword(MD5Utils.MD5("123456"));
         user.setCreateTime(new Date());
         userDao.save(user);
     }

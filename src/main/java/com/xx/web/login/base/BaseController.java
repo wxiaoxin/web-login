@@ -1,6 +1,8 @@
 package com.xx.web.login.base;
 
 import com.alibaba.fastjson.JSONObject;
+import com.xx.web.login.constant.CookieConstant;
+import com.xx.web.login.constant.SessionConstant;
 import org.springframework.web.bind.annotation.ModelAttribute;
 
 import javax.servlet.http.Cookie;
@@ -24,7 +26,8 @@ public class BaseController {
 
     /**
      * 注入Http请求和响应对象
-     * @param req http请求
+     *
+     * @param req  http请求
      * @param resp http响应
      */
     @ModelAttribute
@@ -33,27 +36,37 @@ public class BaseController {
         this.resp = resp;
     }
 
-
     /**
-     * 从cookie中获取登陆用户的id
-     * @return 登陆用户的id
+     * 判断用户是否已登陆
      */
-    protected String getUserId() {
-        Cookie[] cookies = req.getCookies();
-        for(Cookie cookie : cookies) {
-            if(cookie.getName().equals("WY_USER")) {
-                return cookie.getValue();
+    protected boolean isLogin() {
+        /**
+         * 当且仅当cookie中和sesion中保存的用户身份信息一致时，才判定当前用户合法登陆成功
+         * 但是，当非法劫持session和伪造cookie时，该验证安全性丧失
+         */
+        String userId = String.valueOf(req.getSession().getAttribute(SessionConstant.NAME));
+        if (userId != null && !userId.equals("")) {
+            Cookie[] cookies = req.getCookies();
+            if (cookies != null) {
+                for (Cookie cookie : cookies) {
+                    // 当cookie中的id与session中的id一致时，判定当前用户已登陆
+                    if (cookie.getName().equals(CookieConstant.WY_USER) && cookie.getValue().equals(userId)) {
+                        return true;
+                    }
+                }
             }
         }
-        return "";
+        // 否则，判定用户尚未登陆
+        return false;
     }
 
     /**
      * 从session中获取登陆用户的id
+     *
      * @return
      */
     protected String getLoginUserId() {
-        return String.valueOf(req.getSession().getAttribute("LOGIN_USER_ID"));
+        return String.valueOf(req.getSession().getAttribute(SessionConstant.NAME));
     }
 
 

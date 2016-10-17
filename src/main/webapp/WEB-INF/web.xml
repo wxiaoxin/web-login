@@ -44,7 +44,7 @@
 
 
     <welcome-file-list>
-        <welcome-file>index.htm</welcome-file>
+        <welcome-file>login.htm</welcome-file>
     </welcome-file-list>
 
 </web-app>

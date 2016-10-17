@@ -34,8 +34,8 @@
     <mvc:interceptors>
         <mvc:interceptor>
             <mvc:mapping path="/*"/>
-            <mvc:exclude-mapping path="/index.htm"/>
             <mvc:exclude-mapping path="/login.htm"/>
+            <mvc:exclude-mapping path="/index.htm"/>
             <bean class="com.xx.web.login.interceptor.GlobalInterceptor"/>
         </mvc:interceptor>
     </mvc:interceptors>
